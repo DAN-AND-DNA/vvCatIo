@@ -1,25 +1,19 @@
-module vvcatio 
-
-import net
+module vvcatio
 
 
-struct CatSocket {
+struct vvConn {
+pub mut:
+    fd int
+    ip string
+}
+
+struct vvEvents {
 pub:
-    raw_socket net.Socket
+    serving fn(conn *vvConn) int
 }
 
-pub fn new_catsocket(family, typ, proto int) ?CatSocket {
-    rs := net.new_socket(family, typ, proto) or {
-        return error(err)
-    }
 
-    s := CatSocket {
-        raw_socket: rs
-    }
-
-    return s
-}
-
-pub fn (cs CatSocket) close() ?int {
-    return cs.raw_socket.close()
+struct vvServer {
+pub mut:
+    sfd int
 }
