@@ -1,28 +1,32 @@
 module vvevents
 
+import os
+
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <errno.h>
+
+
 
 struct C.epoll_event
 
-fn C.epoll_create1(flags int) int
-fn C.close(fileds int) int
+fn C.epoll_create1() int
+fn C.close() int
+fn C.epoll_wait() int
 
-struct CatEvent {
-mut:
-    e C.epoll_event
+fn error_code() int {
+    return C.errno
 }
 
 pub struct CatChannel {
     efd int
-    //epoll_event_list [] &C.epoll_event
-    epoll_event_list [] &CatEvent
+    epoll_event_list &C.epoll_event
 }
 
 pub struct CatPoller {
     stop bool
 mut:
-    channels [] &CatChannel
+    channel CatChannel
     sfd int
     tfd int
 }
@@ -33,16 +37,17 @@ pub fn new_channel(length int) ?CatChannel {
         return error("epoll create failed")
     }
 
-    mut epoll_event_list := [] &CatEvent{}
+    mut p := byteptr(0)
 
-    for i := 0; i < length; i ++{
-        epoll_event_list << &CatEvent{e: C.epoll_event{} }
+    unsafe {
+        p = malloc(length * sizeof(C.epoll_event))
     }
+
+    
 
     cc := CatChannel {
         efd: efd
-        epoll_event_list: epoll_event_list
-        //epoll_event_list: [] &C.epoll_event { len: length, init: &C.epoll_event{} }
+        epoll_event_list: &C.epoll_event(p)
     }
 
     return cc
@@ -59,6 +64,12 @@ pub fn (mut this CatChannel) close() ?int {
         }
     }
 
+    defer {
+        unsafe {
+            free(this.epoll_event_list)
+        }
+    }
+
     return 0
 }
 
@@ -67,18 +78,14 @@ pub fn new_poller(length int) ?CatPoller {
         return error("length should bigger than zero")
     }
 
-    mut channels := [] &CatChannel{}
 
-    for i := 0; i < length; i++ {
-        cc := new_channel(length) or {
-            return error(err)
-        }
-        channels << &cc
+    channel := new_channel(length) or {
+        return error(err)
     }
 
     cp := CatPoller {
         stop: false
-        channels: channels
+        channel: channel
         sfd: -1
         tfd: -1
     }
@@ -87,11 +94,16 @@ pub fn new_poller(length int) ?CatPoller {
 }
 
 pub fn (mut this CatPoller) close() ?int {
-    for cc in this.channels {
-        cc.close() or {
-            return error(err)    
-        }
+    return this.channel.close()
+}
+
+pub fn (mut this CatPoller) poll(max int) ?int {
+    efd := this.channel.efd
+    fired := C.epoll_wait(efd, this.channel.epoll_event_list, max, 10000)
+    if fired < 0 {
+        error_message := os.get_error_msg(error_code())
+        return error("epoll wait failed: $error_message")
     }
 
-    return 0
+    return fired
 }

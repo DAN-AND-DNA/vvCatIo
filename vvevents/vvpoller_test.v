@@ -9,27 +9,21 @@ fn test_channel() {
         assert false
     }
 
-    cc1 := vvevents.CatChannel{}
-
-    cc1.close() or {
-        assert true
-    }
 }
 
 fn test_poller () {
-    cp := vvevents.new_poller(1) or {
+    cp := vvevents.new_poller(10) or {
         panic(err)
+    }
+
+    cp.poll(10) or {
+        println(err)
+        assert false
     }
 
     cp.close() or {
         assert false
     }
 
-    // test null
-    cp1 := vvevents.CatPoller{}
-
-    cp1.close() or {
-        assert false
-    }
 }
 
