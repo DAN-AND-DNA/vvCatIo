@@ -8,22 +8,23 @@ fn test_channel() {
     cc.close() or {
         assert false
     }
-
 }
 
 fn test_poller () {
-    cp := vvevents.new_poller(10) or {
+    cp := vvevents.new_poller(10, 1000) or {
         panic(err)
     }
 
-    cp.poll(10) or {
-        println(err)
-        assert false
+    mut fds:= []int{len: 10}
+    mut actions := []u32{len: 10}
+    
+    num := cp.poll(10, fds, actions) or {
+        panic(err)
     }
+    _ = num
 
     cp.close() or {
-        assert false
+        panic(err)
     }
-
 }
 
