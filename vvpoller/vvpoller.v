@@ -2,26 +2,6 @@ module vvpoller
 
 import os
 
-#include <sys/epoll.h>
-#include <unistd.h>
-#include <errno.h>
-
-struct C.epoll_data_t {
-mut:
-    fd int
-}
-
-struct C.epoll_event {
-mut:
-    events u32
-    data C.epoll_data_t
-}
-
-fn C.epoll_create1() int
-fn C.close() int
-fn C.epoll_wait() int
-fn C.epoll_ctl() int
-
 fn error_code() int {
     return C.errno
 }
@@ -47,7 +27,7 @@ mut:
     actions [] CatAction
 }
 
-pub fn new_channel(length u32) ?CatChannel {
+fn new_channel(length u32) ?CatChannel {
     efd := C.epoll_create1(C.EPOLL_CLOEXEC)
     if efd < 0 {
         return error("epoll create failed")

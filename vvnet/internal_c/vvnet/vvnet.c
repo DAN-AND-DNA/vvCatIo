@@ -1,6 +1,6 @@
+#include <fcntl.h>
 #include "vvnet.h"
 
-#include <fcntl.h>
 
 int set_nonblock(int fd) {
     int flags = fcntl(fd, F_GETFL);

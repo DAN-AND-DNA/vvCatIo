@@ -1,6 +1,5 @@
 Module {
-	name: 'vvcatio',
+	name: 'vvnet',
 	description: '',
-        version: '0.0.1'
 	dependencies: []
 }

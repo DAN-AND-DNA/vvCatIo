@@ -2,20 +2,11 @@ module vvnet
 
 import net
 
-#flag -I ./internal_c
-
-#include "vvnet.h"
-#include "vvnet.c"
-
-#include <netinet/tcp.h>
-
 pub struct CatServer {
     socket net.Socket
 mut:
     fd int
 }
-
-fn C.set_nonblock(sfd int) int
 
 
 pub fn new_server(port int, backlog int) ?CatServer {
