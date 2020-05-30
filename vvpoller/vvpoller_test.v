@@ -1,7 +1,7 @@
-import vvevents
+import vvpoller
 
 fn test_channel() {
-    cc := vvevents.new_channel(1) or {
+    cc := vvpoller.new_channel(1) or {
         panic(err)
     }
 
@@ -11,7 +11,7 @@ fn test_channel() {
 }
 
 fn test_poller () {
-    cp := vvevents.new_poller(10, 1000) or {
+    cp := vvpoller.new_poller(10, 1000) or {
         panic(err)
     }
 

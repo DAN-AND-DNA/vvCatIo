@@ -1,4 +1,4 @@
-module vvevents
+module vvpoller
 
 import os
 
@@ -31,7 +31,7 @@ pub struct CatChannel {
     epoll_event_list &C.epoll_event
 }
 
-pub struct CatEvent {
+pub struct CatAction {
 mut:
     action int
 }
@@ -44,7 +44,7 @@ pub struct CatPoller {
     max_fd int
 mut:
     channel CatChannel
-    events [] CatEvent
+    actions [] CatAction
 }
 
 pub fn new_channel(length u32) ?CatChannel {
@@ -102,7 +102,7 @@ pub fn new_poller(length int, max_fd int) ?CatPoller {
         stop: false
         max_fd: max_fd
         channel: channel
-        events: [] CatEvent {len: max_fd, init: CatEvent{} }
+        actions: [] CatAction {len: max_fd, init: CatAction{} }
         sfd: -1
         tfd: -1
     }
@@ -139,11 +139,11 @@ fn (mut this CatPoller) add(new_fd int,  action int) ? {
     }
 
     mut op := C.EPOLL_CTL_ADD
-    if this.events[new_fd].action != 0 {
+    if this.actions[new_fd].action != 0 {
         op = C.EPOLL_CTL_MOD
     }
 
-    this.events[new_fd].action |= action
+    this.actions[new_fd].action |= action
 
     mut ee := C.epoll_event {}
 

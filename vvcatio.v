@@ -1,19 +1,8 @@
 module vvcatio
 
+import vvnet
+import vvpoller
 
-struct vvConn {
-pub mut:
-    fd int
-    ip string
+fn serve() int {
 }
 
-struct vvEvents {
-pub:
-    serving fn(conn *vvConn) int
-}
-
-
-struct vvServer {
-pub mut:
-    sfd int
-}
