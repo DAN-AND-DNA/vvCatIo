@@ -8,13 +8,6 @@ pub mut:
     fd int
 }
 
-pub struct CatConn {
-    socket net.Socket
-mut:
-    fd int
-}
-
-
 pub fn new_server(port int, backlog int) ?CatServer {
     s := net.new_socket(C.AF_INET, C.SOCK_STREAM, 0) or {
         return error(err)
@@ -57,13 +50,13 @@ pub fn (this CatServer) accept() ?net.Socket {
         return error("bad server fd")
     }
 
-    cs := this.socket.accept() or {
+    client_socket := this.socket.accept() or {
         return error(err)
     }
 
-    if C.set_nonblock(cs.sockfd) < 0 {
+    if C.set_nonblock(client_socket.sockfd) < 0 {
         return error("set no block failed")
     }
 
-    return cs
+    return client_socket
 }

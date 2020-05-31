@@ -1,2 +1,4 @@
 # vvCatIo
-no copy net lib for vlang
+under processing
+
+example: look into vvcatio_test.v

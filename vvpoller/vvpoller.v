@@ -92,14 +92,17 @@ pub fn (this CatPoller) close() ?int {
     return this.channel.close()
 }
 
-pub fn (this CatPoller) poll(max int, mut fds []int, mut actions []u32) ?int {
-    fired := C.epoll_wait(this.channel.efd, this.channel.epoll_event_list, max, 10000)
-    if fired < 0 && error_code() != C.EINTR {
-        error_message := os.get_error_msg(error_code())
-        return error("epoll wait failed: $error_message")
-    } else {
-        return 0
+pub fn (this CatPoller) poll(once int, mut fds []int, mut actions []u32) ?int {
+    fired := C.epoll_wait(this.channel.efd, this.channel.epoll_event_list, once, 10000)
+    if fired < 0 {
+        if error_code() != C.EINTR {
+            error_message := os.get_error_msg(error_code())
+            return error("epoll wait failed: $error_message")
+        } else  {
+            return 0
+        }
     }
+
 
     for i :=0; i < fired; i++ {
         curr_event := this.channel.epoll_event_list[i]
@@ -133,7 +136,7 @@ fn (mut this CatPoller) add(new_fd int,  action int) ? {
         return error("epoll ctl failed: $error_message")
     }
 
-    return none
+    //return none
 }
 
 

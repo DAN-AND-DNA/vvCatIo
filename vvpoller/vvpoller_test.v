@@ -1,15 +1,5 @@
 import vvpoller
 
-fn test_channel() {
-    cc := vvpoller.new_channel(1) or {
-        panic(err)
-    }
-
-    cc.close() or {
-        assert false
-    }
-}
-
 fn test_poller () {
     cp := vvpoller.new_poller(10, 1000) or {
         panic(err)
