@@ -4,6 +4,12 @@ import net
 
 pub struct CatServer {
     socket net.Socket
+pub mut:
+    fd int
+}
+
+pub struct CatConn {
+    socket net.Socket
 mut:
     fd int
 }

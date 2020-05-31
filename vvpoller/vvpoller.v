@@ -19,7 +19,6 @@ mut:
 
 pub struct CatPoller {
     stop bool
-    sfd int
     tfd int
     max_fd int
 mut:
@@ -54,7 +53,7 @@ pub fn (mut this CatChannel) close() ?int {
     }
 
     if this.efd > 0 {
-        if C.close(this.efd) < 0 {
+        if C.close_fd(this.efd) < 0 {
             return error("close epoll fd failed")
         }
     }
@@ -83,7 +82,6 @@ pub fn new_poller(length int, max_fd int) ?CatPoller {
         max_fd: max_fd
         channel: channel
         actions: [] CatAction {len: max_fd, init: CatAction{} }
-        sfd: -1
         tfd: -1
     }
 
